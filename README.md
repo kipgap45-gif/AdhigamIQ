@@ -10,6 +10,7 @@
         .app-main { max-width: 1300px; margin: 0 auto; }
         .premium-header { background: rgba(255,255,255,0.05); border-radius: 32px; padding: 20px 30px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         .logo h1 { font-size: 1.8rem; background: linear-gradient(135deg, #FFD166, #FF6B6B); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .logo p { color: #94a3b8; font-size: 0.7rem; }
         .nav-buttons { display: flex; gap: 15px; }
         .nav-btn-premium { background: rgba(255,255,255,0.1); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; }
         .nav-btn-premium.active { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
@@ -27,6 +28,540 @@
         .subject-card { background: rgba(255,255,255,0.08); border-radius: 28px; padding: 28px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s; }
         .subject-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.12); }
         .subject-icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .subject-name { font-size: 1.4rem; font-weight: 700; color: white; }
+        .subject-stats { color: #cbd5e1; font-size: 0.8rem; margin-top: 8px; }
+        .exam-container { background: rgba(255,255,255,0.05); border-radius: 32px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); }
+        .question-area { background: rgba(0,0,0,0.3); border-radius: 24px; padding: 30px; margin: 20px 0; }
+        .question-text { font-size: 1.4rem; color: white; margin-bottom: 25px; line-height: 1.5; word-break: break-word; white-space: pre-wrap; font-weight: 500; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 20px; border-left: 4px solid #FF6B6B; }
+        .option { background: rgba(255,255,255,0.08); border-radius: 16px; padding: 12px 18px; margin-bottom: 10px; cursor: pointer; color: #e2e8f0; transition: 0.2s; display: flex; align-items: center; gap: 12px; }
+        .option:hover { background: rgba(255,255,255,0.15); }
+        .option.correct { background: #10b981; }
+        .option.wrong { background: #ef4444; }
+        .option-letter { font-weight: bold; background: #1e293b; padding: 4px 12px; border-radius: 20px; min-width: 40px; text-align: center; }
+        .exam-btn { background: #334155; border: none; padding: 10px 24px; border-radius: 40px; color: white; cursor: pointer; font-weight: 600; }
+        .exam-btn.primary { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
+        .score-show { background: linear-gradient(135deg, #FFD166, #FF6B6B); padding: 8px 18px; border-radius: 40px; display: inline-block; font-weight: bold; margin-bottom: 15px; }
+        .result-box { background: #0f172a; padding: 20px; border-radius: 24px; text-align: center; margin-top: 20px; }
+        .empty-state { text-align: center; padding: 80px 20px; color: #94a3b8; }
+        .empty-state .icon { font-size: 5rem; margin-bottom: 20px; }
+        .back-btn { background: #475569; border: none; padding: 8px 20px; border-radius: 30px; color: white; cursor: pointer; margin-bottom: 20px; }
+        h2 { color: white; margin-bottom: 15px; }
+        .admin-section { background: rgba(0,0,0,0.6); border-radius: 28px; padding: 25px; margin-top: 20px; }
+        .admin-form input, .admin-form textarea, .admin-form select { width: 100%; padding: 12px; margin: 8px 0; border-radius: 16px; border: none; background: #1e293b; color: white; }
+        .question-item { background: #1e293b; padding: 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        .hidden { display: none; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .loading { text-align: center; padding: 40px; color: white; font-size: 1.2rem; }
+        .connection-status { background: #1e293b; padding: 10px 20px; border-radius: 40px; font-size: 0.8rem; margin-bottom: 20px; text-align: center; }
+        .bulk-area { background: #0f172a; padding: 20px; border-radius: 24px; margin-top: 20px; }
+        .bulk-area textarea { width: 100%; padding: 12px; border-radius: 16px; background: #1e293b; color: white; border: none; font-family: monospace; }
+        .json-example { background: #0a0f1a; padding: 10px; border-radius: 12px; font-size: 0.7rem; color: #94a3b8; overflow-x: auto; margin: 10px 0; }
+    </style>
+</head>
+<body>
+<div class="app-main">
+    <div class="premium-header">
+        <div class="logo"><h1>☁️ MCQ Master Pro</h1><p>Firebase Cloud Database</p></div>
+        <div class="nav-buttons">
+            <button class="nav-btn-premium active" id="studentBtn">🎓 Student</button>
+            <button class="nav-btn-premium" id="adminBtn">👑 Admin</button>
+        </div>
+    </div>
+
+    <div id="connectionStatus" class="connection-status">🔄 Firebase এ সংযোগ হচ্ছে...</div>
+
+    <div id="mainOptions" class="main-options">
+        <div class="option-card" data-opt="class"><div class="option-icon">📖</div><div class="option-title">SSC Class</div><div class="option-desc">অধ্যায়ভিত্তিক পড়াশোনা</div></div>
+        <div class="option-card" data-opt="suggestion"><div class="option-icon">⭐</div><div class="option-title">SSC Suggestion</div><div class="option-desc">গুরুত্বপূর্ণ সাজেশন</div></div>
+        <div class="option-card" data-opt="mcq"><div class="option-icon">🎯</div><div class="option-title">MCQ Practice</div><div class="option-desc">এমসিকিউ প্র্যাকটিস</div></div>
+    </div>
+
+    <div id="classPanel" class="content-panel hidden"><button class="back-to-menu" id="backFromClass">← ৩টি অপশনে ফিরুন</button><div class="empty-state"><div class="icon">📖</div><p>শীঘ্রই আসছে...</p></div></div>
+    <div id="suggestionPanel" class="content-panel hidden"><button class="back-to-menu" id="backFromSuggestion">← ৩টি অপশনে ফিরুন</button><div class="empty-state"><div class="icon">⭐</div><p>শীঘ্রই আসছে...</p></div></div>
+
+    <div id="mcqPanel" class="content-panel hidden">
+        <button class="back-to-menu" id="backFromMcq">← ৩টি অপশনে ফিরুন</button>
+        <div id="mcqSubjectList"><div class="loading">📡 ডাটা লোড হচ্ছে...</div><div class="subject-grid" id="mcqSubjects"></div></div>
+        <div id="mcqExamArea" class="hidden">
+            <button class="back-btn" id="backToMcqSubjects">← সব সাবজেক্ট</button>
+            <div class="exam-container"><h2 id="mcqSubjectTitle">Subject</h2><div class="score-show" id="liveScore">Score: 0/0</div>
+            <div class="question-area"><div class="question-text" id="examQuestion">Loading...</div><div id="examOptions"></div></div>
+            <div class="flex-between"><button class="exam-btn" id="prevExamBtn">◀ আগের</button><button class="exam-btn primary" id="nextExamBtn">পরবর্তী ▶</button></div>
+            <div id="examResult" class="result-box hidden"></div></div>
+        </div>
+    </div>
+
+    <div id="adminPanel" class="hidden">
+        <div class="admin-section">
+            <h2>⚙️ Admin Panel</h2>
+            
+            <!-- নতুন সাবজেক্ট যোগ -->
+            <div style="background:#0f172a; padding:20px; border-radius:24px; margin-bottom:30px;">
+                <h3>➕ নতুন সাবজেক্ট যোগ করুন</h3>
+                <input type="text" id="newSubjectId" placeholder="সাবজেক্ট আইডি" style="width:100%; padding:10px; margin:5px 0; border-radius:12px; background:#1e293b; color:white;">
+                <input type="text" id="newSubjectName" placeholder="সাবজেক্ট নাম" style="width:100%; padding:10px; margin:5px 0; border-radius:12px; background:#1e293b; color:white;">
+                <input type="text" id="newSubjectIcon" placeholder="আইকন" style="width:100%; padding:10px; margin:5px 0; border-radius:12px; background:#1e293b; color:white;">
+                <button class="exam-btn primary" id="addSubjectBtn">✅ যোগ করুন</button>
+            </div>
+            
+            <!-- একক MCQ যোগ -->
+            <div style="background:#0f172a; padding:20px; border-radius:24px; margin-bottom:30px;">
+                <h3>✏️ একক MCQ যোগ করুন</h3>
+                <div class="admin-form">
+                    <select id="adminSubject"></select>
+                    <input type="text" id="adminQuestion" placeholder="প্রশ্ন" />
+                    <input type="text" id="adminOpt1" placeholder="Option A" />
+                    <input type="text" id="adminOpt2" placeholder="Option B" />
+                    <input type="text" id="adminOpt3" placeholder="Option C" />
+                    <input type="text" id="adminOpt4" placeholder="Option D" />
+                    <select id="adminCorrect"><option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option></select>
+                    <textarea id="adminExplanation" placeholder="ব্যাখ্যা"></textarea>
+                    <button class="exam-btn primary" id="addMcqBtn">➕ MCQ যোগ করুন</button>
+                </div>
+            </div>
+            
+            <!-- Bulk MCQ যোগ (JSON format - আগের structure অনুযায়ী) -->
+            <div style="background:#0f172a; padding:20px; border-radius:24px; margin-bottom:30px;">
+                <h3>📦 Bulk MCQ যোগ করুন (JSON)</h3>
+                <p style="color:#94a3b8; font-size:0.8rem; margin-bottom:10px;">JSON ফরম্যাট (আগের structure অনুযায়ী):</p>
+                <div class="json-example">
+                    [
+                      {
+                        "text": "প্রশ্নের টেক্সট",
+                        "options": ["অপশন A", "অপশন B", "অপশন C", "অপশন D"],
+                        "correct": 0,
+                        "explanation": "ব্যাখ্যা"
+                      }
+                    ]
+                </div>
+                <select id="bulkSubject" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; background:#1e293b; color:white;"></select>
+                <textarea id="bulkJsonData" rows="6" placeholder='[{"text":"প্রশ্ন?","options":["ক","খ","গ","ঘ"],"correct":0,"explanation":"ব্যাখ্যা"}]' style="width:100%; padding:12px; border-radius:16px; background:#1e293b; color:white; border:none; font-family:monospace;"></textarea>
+                <input type="file" id="jsonFileInput" accept=".json" style="margin:10px 0; color:#94a3b8;">
+                <button class="exam-btn primary" id="bulkAddBtn" style="margin-top:10px;">📦 Bulk যোগ করুন</button>
+            </div>
+            
+            <!-- MCQ তালিকা -->
+            <h3 style="margin-top:30px;">📋 MCQ তালিকা</h3>
+            <select id="viewSubject"></select>
+            <button class="exam-btn" id="loadQuestionsBtn">লোড করুন</button>
+            <div id="questionsList" style="margin-top:20px;"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyD3Sqrghzj2lQTEPlS4ma8XOUaUYEISzEs",
+        authDomain: "mcq-striker.firebaseapp.com",
+        projectId: "mcq-striker",
+        storageBucket: "mcq-striker.firebasestorage.app",
+        messagingSenderId: "909666274032",
+        appId: "1:909666274032:web:1cd8e2c966d54659525035",
+        measurementId: "G-HH1S9RVLJD"
+    };
+
+    let db;
+    try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        
+        const connectedRef = firebase.database().ref(".info/connected");
+        connectedRef.on("value", (snap) => {
+            if (snap.val() === true) {
+                document.getElementById("connectionStatus").innerHTML = '✅ Firebase এ সংযুক্ত!';
+                document.getElementById("connectionStatus").style.background = '#064e3b';
+                loadAllData();
+            } else {
+                document.getElementById("connectionStatus").innerHTML = '⚠️ সংযোগ বিচ্ছিন্ন!';
+                document.getElementById("connectionStatus").style.background = '#7c2d12';
+            }
+        });
+    } catch(e) {
+        console.error("Firebase error:", e);
+    }
+
+    let subjectsList = [];
+    let mcqDatabase = {};
+    let currentSubject = null, currentSubjectName = null, currentQuestions = [], currentIndex = 0, userAnswers = {};
+
+    async function loadAllData() {
+        try {
+            const subjectsSnapshot = await db.ref('subjects').once('value');
+            if (subjectsSnapshot.exists()) {
+                subjectsList = Object.values(subjectsSnapshot.val());
+            } else {
+                subjectsList = [
+                    { id: "bangla", name: "বাংলা", icon: "📖" },
+                    { id: "english", name: "ইংরেজি", icon: "🇬🇧" },
+                    { id: "math", name: "গণিত", icon: "🧮" }
+                ];
+                const subjectsObj = {};
+                subjectsList.forEach((s,i)=>subjectsObj[i]=s);
+                await db.ref('subjects').set(subjectsObj);
+            }
+
+            const mcqSnapshot = await db.ref('mcqs').once('value');
+            if (mcqSnapshot.exists()) {
+                mcqDatabase = mcqSnapshot.val();
+            } else {
+                mcqDatabase = {
+                    bangla: [{ text: "‘সঞ্চিতা’ কাব্যগ্রন্থের রচয়িতা কে?", options: ["কাজী নজরুল ইসলাম", "সুকান্ত ভট্টাচার্য", "জীবনানন্দ দাশ", "শামসুর রাহমান"], correct: 0, explanation: "সঞ্চিতা - কাজী নজরুল ইসলাম" }],
+                    english: [{ text: "Synonym of 'Beautiful'?", options: ["Ugly", "Pretty", "Bad", "Worst"], correct: 1, explanation: "Beautiful = Pretty" }],
+                    math: [{ text: "x + 10 = 20, x = ?", options: ["5", "10", "15", "20"], correct: 1, explanation: "x = 10" }]
+                };
+                await db.ref('mcqs').set(mcqDatabase);
+            }
+            
+            setTimeout(()=>{
+                if(document.getElementById("connectionStatus")) 
+                    document.getElementById("connectionStatus").style.display = 'none';
+            }, 2000);
+            
+            await renderMcqSubjects();
+            await refreshAllDropdowns();
+            await refreshBulkDropdown();
+        } catch(e) {
+            console.error("Error:", e);
+        }
+    }
+
+    async function refreshBulkDropdown() {
+        const bulkSub = document.getElementById("bulkSubject");
+        if(bulkSub){
+            bulkSub.innerHTML = "";
+            subjectsList.forEach(sub => {
+                const opt = document.createElement("option");
+                opt.value = sub.id;
+                opt.textContent = sub.name;
+                bulkSub.appendChild(opt);
+            });
+        }
+    }
+
+    async function addSubjectToFirebase(subject) {
+        const s = await db.ref('subjects').once('value');
+        const count = s.exists() ? Object.keys(s.val()).length : 0;
+        await db.ref(`subjects/${count}`).set(subject);
+    }
+
+    async function addMcqToFirebase(subjectId, mcq) {
+        const s = await db.ref(`mcqs/${subjectId}`).once('value');
+        const count = s.exists() ? Object.keys(s.val()).length : 0;
+        await db.ref(`mcqs/${subjectId}/${count}`).set(mcq);
+    }
+
+    async function deleteMcqFromFirebase(subjectId, idx) {
+        await db.ref(`mcqs/${subjectId}/${idx}`).remove();
+    }
+
+    // Bulk MCQ যোগ করার ফাংশন - JSON structure আগের মতোই থাকবে
+    async function bulkAddMcq() {
+        const subject = document.getElementById("bulkSubject").value;
+        const jsonText = document.getElementById("bulkJsonData").value.trim();
+        
+        if(!jsonText){
+            alert("JSON ডাটা দিন!");
+            return;
+        }
+        
+        try {
+            const newMcqs = JSON.parse(jsonText);
+            if(!Array.isArray(newMcqs)){
+                alert("JSON একটি Array হতে হবে!");
+                return;
+            }
+            
+            if(!mcqDatabase[subject]) mcqDatabase[subject] = [];
+            let addedCount = 0;
+            
+            for(const mcq of newMcqs){
+                // ভ্যালিডেশন - text, options (4টি), correct (number)
+                if(mcq.text && mcq.options && Array.isArray(mcq.options) && mcq.options.length === 4 && typeof mcq.correct === 'number'){
+                    const newMcq = {
+                        text: mcq.text,
+                        options: mcq.options,
+                        correct: mcq.correct,
+                        explanation: mcq.explanation || "ব্যাখ্যা নেই"
+                    };
+                    mcqDatabase[subject].push(newMcq);
+                    await addMcqToFirebase(subject, newMcq);
+                    addedCount++;
+                }
+            }
+            
+            alert(`${addedCount} টি MCQ যোগ হয়েছে!`);
+            document.getElementById("bulkJsonData").value = "";
+            await renderMcqSubjects();
+            await loadQuestionsListForAdmin();
+            
+        } catch(e){
+            alert("JSON ফরম্যাট ঠিক নয়! Error: " + e.message);
+        }
+    }
+
+    // JSON ফাইল আপলোড
+    function handleJsonFileUpload(event) {
+        const file = event.target.files[0];
+        if(!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById("bulkJsonData").value = e.target.result;
+        };
+        reader.readAsText(file);
+    }
+
+    const mainOptions = document.getElementById("mainOptions");
+    const classPanel = document.getElementById("classPanel");
+    const suggestionPanel = document.getElementById("suggestionPanel");
+    const mcqPanel = document.getElementById("mcqPanel");
+    const adminPanel = document.getElementById("adminPanel");
+
+    function showMenu() {
+        mainOptions.classList.remove("hidden");
+        classPanel.classList.add("hidden");
+        suggestionPanel.classList.add("hidden");
+        mcqPanel.classList.add("hidden");
+    }
+
+    function hideMenuAndShow(panelId) {
+        mainOptions.classList.add("hidden");
+        classPanel.classList.add("hidden");
+        suggestionPanel.classList.add("hidden");
+        mcqPanel.classList.add("hidden");
+        document.getElementById(panelId).classList.remove("hidden");
+    }
+
+    document.querySelectorAll(".option-card").forEach(card => {
+        card.onclick = () => {
+            const opt = card.getAttribute("data-opt");
+            if(opt === "class") hideMenuAndShow("classPanel");
+            else if(opt === "suggestion") hideMenuAndShow("suggestionPanel");
+            else if(opt === "mcq") { hideMenuAndShow("mcqPanel"); renderMcqSubjects(); }
+        };
+    });
+
+    document.getElementById("backFromClass").onclick = showMenu;
+    document.getElementById("backFromSuggestion").onclick = showMenu;
+    document.getElementById("backFromMcq").onclick = showMenu;
+
+    async function renderMcqSubjects() {
+        const grid = document.getElementById("mcqSubjects");
+        const loading = document.querySelector("#mcqSubjectList .loading");
+        if(loading) loading.style.display = "block";
+        grid.innerHTML = "";
+        document.getElementById("mcqSubjectList").classList.remove("hidden");
+        document.getElementById("mcqExamArea").classList.add("hidden");
+        
+        subjectsList.forEach(sub => {
+            const qCount = mcqDatabase[sub.id]?.length || 0;
+            const card = document.createElement("div");
+            card.className = "subject-card";
+            card.innerHTML = `<div class="subject-icon">${sub.icon}</div><div class="subject-name">${sub.name}</div><div class="subject-stats">📝 ${qCount} টি MCQ</div>`;
+            card.onclick = () => startMcqExam(sub.id, sub.name);
+            grid.appendChild(card);
+        });
+        if(loading) loading.style.display = "none";
+    }
+
+    function startMcqExam(subjectId, subjectName) {
+        currentSubject = subjectId;
+        currentSubjectName = subjectName;
+        currentQuestions = [...(mcqDatabase[subjectId] || [])];
+        currentIndex = 0;
+        userAnswers = {};
+        document.getElementById("mcqSubjectList").classList.add("hidden");
+        document.getElementById("mcqExamArea").classList.remove("hidden");
+        document.getElementById("mcqSubjectTitle").innerText = subjectName;
+        updateMcqScore();
+        renderMcqQuestion();
+    }
+
+    function renderMcqQuestion() {
+        if(!currentQuestions.length) {
+            document.getElementById("examQuestion").innerHTML = "❌ কোনো MCQ নেই। অ্যাডমিন প্যানেলে যোগ করুন!";
+            document.getElementById("examOptions").innerHTML = "";
+            return;
+        }
+        const q = currentQuestions[currentIndex];
+        document.getElementById("examQuestion").innerHTML = `<span style="color:#FFD166; font-weight:bold; background:#1e293b; padding:5px 15px; border-radius:30px; display:inline-block; margin-right:12px;">${currentIndex+1}</span> ${q.text}`;
+        const optionsDiv = document.getElementById("examOptions");
+        optionsDiv.innerHTML = "";
+        const savedAns = userAnswers[currentIndex];
+        q.options.forEach((opt, idx) => {
+            const optDiv = document.createElement("div");
+            optDiv.className = "option";
+            const letter = String.fromCharCode(65+idx);
+            optDiv.innerHTML = `<span class="option-letter">${letter}</span> <span>${opt}</span>`;
+            if(savedAns !== undefined){
+                if(idx === q.correct) optDiv.classList.add("correct");
+                if(idx === savedAns && idx !== q.correct) optDiv.classList.add("wrong");
+            }
+            if(savedAns === undefined) {
+                optDiv.onclick = () => { 
+                    userAnswers[currentIndex] = idx; 
+                    renderMcqQuestion(); 
+                    updateMcqScore(); 
+                };
+            }
+            optionsDiv.appendChild(optDiv);
+        });
+        let expl = document.getElementById("tempExplanation");
+        if(expl) expl.remove();
+        if(savedAns !== undefined){
+            const isCorrect = (savedAns === q.correct);
+            const icon = isCorrect ? "✅" : "❌";
+            expl = document.createElement("div");
+            expl.id = "tempExplanation";
+            expl.style.cssText = "background:#0f172a; padding:15px; border-radius:16px; margin-top:15px; color:#cbd5e1; border-left: 4px solid " + (isCorrect ? "#10b981" : "#ef4444");
+            expl.innerHTML = `${icon} <strong>ব্যাখ্যা:</strong> ${currentQuestions[currentIndex].explanation || "কোন ব্যাখ্যা নেই"}`;
+            optionsDiv.parentNode.appendChild(expl);
+        }
+    }
+
+    function updateMcqScore() {
+        let a=0,c=0;
+        currentQuestions.forEach((q,i)=>{
+            if(userAnswers[i]!==undefined){ a++; if(userAnswers[i]===q.correct) c++; }
+        });
+        document.getElementById("liveScore").innerText = `📊 Score: ${c}/${currentQuestions.length}`;
+        if(a === currentQuestions.length && currentQuestions.length > 0){
+            const p = (c/currentQuestions.length)*100;
+            const res = document.getElementById("examResult");
+            res.classList.remove("hidden");
+            res.innerHTML = `<h3>🎯 পরীক্ষা শেষ!</h3><p style="font-size:1.5rem;margin:15px;">${c}/${currentQuestions.length}</p><p>নম্বর: ${p.toFixed(1)}%</p><button class="exam-btn primary" id="restartExamBtn">🔄 আবার শুরু করুন</button>`;
+            document.getElementById("restartExamBtn")?.addEventListener("click",()=>{ userAnswers={}; currentIndex=0; res.classList.add("hidden"); renderMcqQuestion(); updateMcqScore(); });
+        }
+    }
+
+    function nextQuestion() { if(currentIndex+1 < currentQuestions.length) currentIndex++; else if(Object.keys(userAnswers).length !== currentQuestions.length) alert("⚠️ সব প্রশ্নের উত্তর দিন!"); renderMcqQuestion(); }
+    function prevQuestion() { if(currentIndex > 0) currentIndex--; renderMcqQuestion(); }
+
+    document.getElementById("nextExamBtn").onclick = nextQuestion;
+    document.getElementById("prevExamBtn").onclick = prevQuestion;
+    document.getElementById("backToMcqSubjects").onclick = renderMcqSubjects;
+
+    async function refreshAllDropdowns() {
+        const selects = ["adminSubject", "viewSubject"];
+        selects.forEach(id => {
+            const s = document.getElementById(id);
+            if(s){
+                s.innerHTML = "";
+                subjectsList.forEach(sub => {
+                    const opt = document.createElement("option");
+                    opt.value = sub.id;
+                    opt.textContent = sub.name;
+                    s.appendChild(opt);
+                });
+            }
+        });
+    }
+
+    async function addNewSubject() {
+        const id = document.getElementById("newSubjectId").value.trim();
+        const name = document.getElementById("newSubjectName").value.trim();
+        const icon = document.getElementById("newSubjectIcon").value.trim();
+        if(!id || !name){ alert("আইডি ও নাম দিন!"); return; }
+        if(subjectsList.find(s=>s.id===id)){ alert("এই আইডি আগে আছে!"); return; }
+        const newSub = { id, name, icon: icon || "📚" };
+        subjectsList.push(newSub);
+        if(!mcqDatabase[id]) mcqDatabase[id] = [];
+        await addSubjectToFirebase(newSub);
+        await db.ref('mcqs').set(mcqDatabase);
+        await renderMcqSubjects();
+        await refreshAllDropdowns();
+        await refreshBulkDropdown();
+        alert("নতুন সাবজেক্ট যোগ হয়েছে!");
+        document.getElementById("newSubjectId").value = "";
+        document.getElementById("newSubjectName").value = "";
+        document.getElementById("newSubjectIcon").value = "";
+    }
+
+    async function addSingleMCQ() {
+        const sub = document.getElementById("adminSubject").value;
+        const text = document.getElementById("adminQuestion").value.trim();
+        const o1 = document.getElementById("adminOpt1").value.trim();
+        const o2 = document.getElementById("adminOpt2").value.trim();
+        const o3 = document.getElementById("adminOpt3").value.trim();
+        const o4 = document.getElementById("adminOpt4").value.trim();
+        const cor = parseInt(document.getElementById("adminCorrect").value);
+        const exp = document.getElementById("adminExplanation").value.trim();
+        if(!text || !o1 || !o2 || !o3 || !o4){ alert("সব ঘর পূরণ করুন!"); return; }
+        if(!mcqDatabase[sub]) mcqDatabase[sub] = [];
+        const newMcq = { text, options: [o1,o2,o3,o4], correct: cor, explanation: exp || "ব্যাখ্যা নেই" };
+        mcqDatabase[sub].push(newMcq);
+        await addMcqToFirebase(sub, newMcq);
+        alert("MCQ যোগ হয়েছে!");
+        document.getElementById("adminQuestion").value = "";
+        document.getElementById("adminOpt1").value = "";
+        document.getElementById("adminOpt2").value = "";
+        document.getElementById("adminOpt3").value = "";
+        document.getElementById("adminOpt4").value = "";
+        document.getElementById("adminExplanation").value = "";
+        await loadQuestionsListForAdmin();
+        await renderMcqSubjects();
+    }
+
+    async function loadQuestionsListForAdmin() {
+        const sub = document.getElementById("viewSubject").value;
+        const qs = mcqDatabase[sub] || [];
+        const cont = document.getElementById("questionsList");
+        if(!qs.length){ cont.innerHTML = "<p style='color:white'>কোনো প্রশ্ন নেই</p>"; return; }
+        cont.innerHTML = "";
+        qs.forEach((q,idx)=>{
+            const div = document.createElement("div");
+            div.className = "question-item";
+            div.innerHTML = `<div><strong>${idx+1}. ${q.text.substring(0,70)}</strong><br><small>✅ ${q.options[q.correct]}</small></div><button class="exam-btn del-q" data-sub="${sub}" data-idx="${idx}" style="background:#ef4444;padding:6px 16px;">Delete</button>`;
+            cont.appendChild(div);
+        });
+        document.querySelectorAll(".del-q").forEach(btn=>{
+            btn.addEventListener("click", async (e)=>{
+                const sub = btn.getAttribute("data-sub");
+                const idx = parseInt(btn.getAttribute("data-idx"));
+                mcqDatabase[sub].splice(idx,1);
+                await deleteMcqFromFirebase(sub, idx);
+                await db.ref('mcqs').set(mcqDatabase);
+                await loadQuestionsListForAdmin();
+                await renderMcqSubjects();
+                alert("Deleted");
+            });
+        });
+    }
+
+    document.getElementById("studentBtn").onclick = () => {
+        document.getElementById("studentBtn").classList.add("active");
+        document.getElementById("adminBtn").classList.remove("active");
+        adminPanel.classList.add("hidden");
+        showMenu();
+    };
+    
+    document.getElementById("adminBtn").onclick = () => {
+        const pwd = prompt("Admin password:");
+        if(pwd === "admin123"){
+            document.getElementById("adminBtn").classList.add("active");
+            document.getElementById("studentBtn").classList.remove("active");
+            adminPanel.classList.remove("hidden");
+            mainOptions.classList.add("hidden");
+            classPanel.classList.add("hidden");
+            suggestionPanel.classList.add("hidden");
+            mcqPanel.classList.add("hidden");
+            refreshAllDropdowns();
+            refreshBulkDropdown();
+            loadQuestionsListForAdmin();
+        } else alert("ভুল পাসওয়ার্ড");
+    };
+
+    document.getElementById("addMcqBtn").onclick = addSingleMCQ;
+    document.getElementById("addSubjectBtn").onclick = addNewSubject;
+    document.getElementById("loadQuestionsBtn").onclick = loadQuestionsListForAdmin;
+    document.getElementById("bulkAddBtn").onclick = bulkAddMcq;
+    document.getElementById("jsonFileInput").onchange = handleJsonFileUpload;
+</script>
+</body>
+</html>        .subject-icon { font-size: 2.5rem; margin-bottom: 12px; }
         .subject-name { font-size: 1.4rem; font-weight: 700; color: white; }
         .subject-stats { color: #cbd5e1; font-size: 0.8rem; margin-top: 8px; }
         .exam-container { background: rgba(255,255,255,0.05); border-radius: 32px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); }
